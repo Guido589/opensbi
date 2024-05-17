@@ -153,6 +153,25 @@
 #define PMP_ADDR_MASK			_UL(0xFFFFFFFF)
 #endif
 
+#define SRCMD_COUNT 16
+#define SRCMD_EN_MAX_IDX 30
+#define SRCMD_ENH_MAX_IDX 31
+#define SRCMD_BITMAP_BASE 1
+
+#define MDCFG_COUNT 63
+#define MDCFG_TOP_RANGE 0xFFFF
+#define MDCFG_RSV       0xFFFFFFFFFFFF0000
+
+#define ENTRY_COUNT 16
+#define ENTRY_ADDR_SHIFT 2
+#define ENTRY_CFG_R     0x01
+#define ENTRY_CFG_W     0x02
+#define ENTRY_CFG_X     0x04
+#define ENTRY_CFG_A     0x18
+#define ENTRY_CFG_RSV   0xFFFFFFFFFFFFFFE0
+#define ENTRY_CFG_OFF   0
+#define ENTRY_CFG_TOR   0x08
+
 #if __riscv_xlen == 64
 #define MSTATUS_SD			MSTATUS64_SD
 #define SSTATUS_SD			SSTATUS64_SD
@@ -533,6 +552,124 @@
 #define CSR_PMPADDR61			0x3ed
 #define CSR_PMPADDR62			0x3ee
 #define CSR_PMPADDR63			0x3ef
+
+/* iopmp */
+// MDCFG Table
+#define CSR_MDCFG0 0x7c0
+#define CSR_MDCFG1 0x7c1
+#define CSR_MDCFG2 0x7c2
+#define CSR_MDCFG3 0x7c3
+#define CSR_MDCFG4 0x7c4
+#define CSR_MDCFG5 0x7c5
+#define CSR_MDCFG6 0x7c6
+#define CSR_MDCFG7 0x7c7
+#define CSR_MDCFG8 0x7c8
+#define CSR_MDCFG9 0x7c9
+#define CSR_MDCFG10 0x7ca
+#define CSR_MDCFG11 0x7cb
+#define CSR_MDCFG12 0x7cc
+#define CSR_MDCFG13 0x7cd
+#define CSR_MDCFG14 0x7ce
+#define CSR_MDCFG15 0x7cf
+#define CSR_MDCFG16 0x7d0
+#define CSR_MDCFG17 0x7d1
+#define CSR_MDCFG18 0x7d2
+#define CSR_MDCFG19 0x7d3
+#define CSR_MDCFG20 0x7d4
+#define CSR_MDCFG21 0x7d5
+#define CSR_MDCFG22 0x7d6
+#define CSR_MDCFG23 0x7d7
+#define CSR_MDCFG24 0x7d8
+#define CSR_MDCFG25 0x7d9
+#define CSR_MDCFG26 0x7da
+#define CSR_MDCFG27 0x7db
+#define CSR_MDCFG28 0x7dc
+#define CSR_MDCFG29 0x7dd
+#define CSR_MDCFG30 0x7de
+#define CSR_MDCFG31 0x7df
+#define CSR_MDCFG32 0x7e0
+#define CSR_MDCFG33 0x7e1
+#define CSR_MDCFG34 0x7e2
+#define CSR_MDCFG35 0x7e3
+#define CSR_MDCFG36 0x7e4
+#define CSR_MDCFG37 0x7e5
+#define CSR_MDCFG38 0x7e6
+#define CSR_MDCFG39 0x7e7
+#define CSR_MDCFG40 0x7e8
+#define CSR_MDCFG41 0x7e9
+#define CSR_MDCFG42 0x7ea
+#define CSR_MDCFG43 0x7eb
+#define CSR_MDCFG44 0x7ec
+#define CSR_MDCFG45 0x7ed
+#define CSR_MDCFG46 0x7ee
+#define CSR_MDCFG47 0x7ef
+#define CSR_MDCFG48 0x7f0
+#define CSR_MDCFG49 0x7f1
+#define CSR_MDCFG50 0x7f2
+#define CSR_MDCFG51 0x7f3
+#define CSR_MDCFG52 0x7f4
+#define CSR_MDCFG53 0x7f5
+#define CSR_MDCFG54 0x7f6
+#define CSR_MDCFG55 0x7f7
+#define CSR_MDCFG56 0x7f8
+#define CSR_MDCFG57 0x7f9
+#define CSR_MDCFG58 0x7fa
+#define CSR_MDCFG59 0x7fb
+#define CSR_MDCFG60 0x7fc
+#define CSR_MDCFG61 0x7fd
+#define CSR_MDCFG62 0x7fe
+
+// SRCMD Table Registers
+#define CSR_SRCMD0 0xBC0
+#define CSR_SRCMD1 0xBC1
+#define CSR_SRCMD2 0xBC2
+#define CSR_SRCMD3 0xBC3
+#define CSR_SRCMD4 0xBC4
+#define CSR_SRCMD5 0xBC5
+#define CSR_SRCMD6 0xBC6
+#define CSR_SRCMD7 0xBC7
+#define CSR_SRCMD8 0xBC8
+#define CSR_SRCMD9 0xBC9
+#define CSR_SRCMD10 0xBCA
+#define CSR_SRCMD11 0xBCB
+#define CSR_SRCMD12 0xBCC
+#define CSR_SRCMD13 0xBCD
+#define CSR_SRCMD14 0xBCE
+#define CSR_SRCMD15 0xBCF
+
+// Entry Array Registers
+#define CSR_ENTRY_ADDR0 0xBD0
+#define CSR_ENTRY_CFG0  0xBE0
+#define CSR_ENTRY_ADDR1 0xBD1
+#define CSR_ENTRY_CFG1  0xBE1
+#define CSR_ENTRY_ADDR2 0xBD2
+#define CSR_ENTRY_CFG2  0xBE2
+#define CSR_ENTRY_ADDR3 0xBD3
+#define CSR_ENTRY_CFG3  0xBE3
+#define CSR_ENTRY_ADDR4 0xBD4
+#define CSR_ENTRY_CFG4  0xBE4
+#define CSR_ENTRY_ADDR5 0xBD5
+#define CSR_ENTRY_CFG5  0xBE5
+#define CSR_ENTRY_ADDR6 0xBD6
+#define CSR_ENTRY_CFG6  0xBE6
+#define CSR_ENTRY_ADDR7 0xBD7
+#define CSR_ENTRY_CFG7  0xBE7
+#define CSR_ENTRY_ADDR8 0xBD8
+#define CSR_ENTRY_CFG8  0xBE8
+#define CSR_ENTRY_ADDR9 0xBD9
+#define CSR_ENTRY_CFG9  0XBE9
+#define CSR_ENTRY_ADDR10 0xBDA
+#define CSR_ENTRY_CFG10  0XBEA
+#define CSR_ENTRY_ADDR11 0xBDB
+#define CSR_ENTRY_CFG11  0xBEB
+#define CSR_ENTRY_ADDR12 0xBDC
+#define CSR_ENTRY_CFG12  0xBEC
+#define CSR_ENTRY_ADDR13 0xBDD
+#define CSR_ENTRY_CFG13  0xBED
+#define CSR_ENTRY_ADDR14 0xBDE
+#define CSR_ENTRY_CFG14  0xBEE
+#define CSR_ENTRY_ADDR15 0xBDF
+#define CSR_ENTRY_CFG15  0xBEF
 
 /* Machine Counters/Timers */
 #define CSR_MCYCLE			0xb00

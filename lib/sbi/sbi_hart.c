@@ -33,6 +33,9 @@ struct hart_features {
 	unsigned long extensions;
 	unsigned int pmp_count;
 	unsigned int pmp_addr_bits;
+	unsigned int srcmd_count;
+	unsigned int mdcfg_count;
+	unsigned int entry_count;
 	unsigned long pmp_gran;
 	unsigned int mhpm_count;
 	unsigned int mhpm_bits;
@@ -284,6 +287,30 @@ unsigned int sbi_hart_pmp_addrbits(struct sbi_scratch *scratch)
 	return hfeatures->pmp_addr_bits;
 }
 
+unsigned int sbi_hart_srcmd_count(struct sbi_scratch *scratch)
+{
+	struct hart_features *hfeatures =
+			sbi_scratch_offset_ptr(scratch, hart_features_offset);
+
+	return hfeatures->srcmd_count;
+}
+
+unsigned int sbi_hart_mdcfg_count(struct sbi_scratch *scratch)
+{
+	struct hart_features *hfeatures =
+			sbi_scratch_offset_ptr(scratch, hart_features_offset);
+
+	return hfeatures->mdcfg_count;
+}
+
+unsigned int sbi_hart_entry_count(struct sbi_scratch *scratch)
+{
+	struct hart_features *hfeatures =
+			sbi_scratch_offset_ptr(scratch, hart_features_offset);
+
+	return hfeatures->entry_count;
+}
+
 unsigned int sbi_hart_mhpm_bits(struct sbi_scratch *scratch)
 {
 	struct hart_features *hfeatures =
@@ -329,6 +356,31 @@ int sbi_hart_pmp_configure(struct sbi_scratch *scratch)
 			sbi_printf(" because memory region address %lx or size %lx is not in range\n",
 				    reg->base, reg->order);
 		}
+	}
+
+	return 0;
+}
+
+int sbi_hart_iopmp_configure(struct sbi_scratch *scratch)
+{
+	unsigned long srcmd_initial = 2, mdcfg_initial = 1, entry_addr_initial = 0xFFFFFFFFFFFFFFFF, iopmp_flags = 0;
+	unsigned int srcmd_count = sbi_hart_srcmd_count(scratch);
+	unsigned int mdcfg_count = sbi_hart_mdcfg_count(scratch);
+	unsigned int entry_count = sbi_hart_entry_count(scratch);
+
+	if (srcmd_count){
+		for (unsigned int srcmd_idx = 0; srcmd_idx < srcmd_count; srcmd_idx++) {
+			srcmd_set(srcmd_idx, srcmd_initial);
+		}
+	}
+
+	if (mdcfg_count) {
+		mdcfg_set(0, mdcfg_initial);
+	}
+
+	if (entry_count) {
+		iopmp_flags |= ENTRY_CFG_TOR | ENTRY_CFG_R | ENTRY_CFG_W | ENTRY_CFG_X;
+		entry_set(0, iopmp_flags, entry_addr_initial);
 	}
 
 	return 0;
@@ -551,6 +603,9 @@ static int hart_detect_features(struct sbi_scratch *scratch)
 	/* Clear hart features */
 	hfeatures->extensions = 0;
 	hfeatures->pmp_count = 0;
+	hfeatures->srcmd_count = 0;
+	hfeatures->mdcfg_count = 0;
+	hfeatures->entry_count = 0;
 	hfeatures->mhpm_count = 0;
 
 #define __check_csr(__csr, __rdonly, __wrval, __field, __skip)	\
@@ -575,18 +630,33 @@ static int hart_detect_features(struct sbi_scratch *scratch)
 #define __check_csr_2(__csr, __rdonly, __wrval, __field, __skip)	\
 	__check_csr(__csr + 0, __rdonly, __wrval, __field, __skip)	\
 	__check_csr(__csr + 1, __rdonly, __wrval, __field, __skip)
+#define __check_csr_3(__csr, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_2(__csr + 0, __rdonly, __wrval, __field, __skip)	\
+	__check_csr(__csr + 2, __rdonly, __wrval, __field, __skip)
 #define __check_csr_4(__csr, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_2(__csr + 0, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_2(__csr + 2, __rdonly, __wrval, __field, __skip)
+#define __check_csr_7(__csr, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_4(__csr + 0, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_3(__csr + 4, __rdonly, __wrval, __field, __skip)
 #define __check_csr_8(__csr, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_4(__csr + 0, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_4(__csr + 4, __rdonly, __wrval, __field, __skip)
+#define __check_csr_15(__csr, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_8(__csr + 0, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_7(__csr + 8, __rdonly, __wrval, __field, __skip)
 #define __check_csr_16(__csr, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_8(__csr + 0, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_8(__csr + 8, __rdonly, __wrval, __field, __skip)
+#define __check_csr_31(__csr, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_16(__csr + 0, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_15(__csr + 16, __rdonly, __wrval, __field, __skip)
 #define __check_csr_32(__csr, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_16(__csr + 0, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_16(__csr + 16, __rdonly, __wrval, __field, __skip)
+#define __check_csr_63(__csr, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_32(__csr + 0, __rdonly, __wrval, __field, __skip)	\
+	__check_csr_31(__csr + 32, __rdonly, __wrval, __field, __skip)
 #define __check_csr_64(__csr, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_32(__csr + 0, __rdonly, __wrval, __field, __skip)	\
 	__check_csr_32(__csr + 32, __rdonly, __wrval, __field, __skip)
@@ -603,6 +673,18 @@ static int hart_detect_features(struct sbi_scratch *scratch)
 		__check_csr_64(CSR_PMPADDR0, 0, val, pmp_count, __pmp_skip);
 	}
 __pmp_skip:
+
+	__check_csr_16(CSR_ENTRY_ADDR0, 0, 1UL, entry_count, __entry_skip);
+
+__entry_skip:
+
+	__check_csr_63(CSR_MDCFG0, 0, 1UL, mdcfg_count, __mdcfg_skip);
+
+__mdcfg_skip:
+
+	__check_csr_16(CSR_SRCMD0, 0, 1UL, srcmd_count, __srcmd_skip);
+
+__srcmd_skip:
 
 	/* Detect number of MHPM counters */
 	__check_csr(CSR_MHPMCOUNTER3, 0, 1UL, mhpm_count, __mhpm_skip);

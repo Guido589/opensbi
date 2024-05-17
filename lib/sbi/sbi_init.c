@@ -151,6 +151,12 @@ static void sbi_boot_print_hart(struct sbi_scratch *scratch, u32 hartid)
 		   sbi_hart_pmp_granularity(scratch));
 	sbi_printf("Boot HART PMP Address Bits: %d\n",
 		   sbi_hart_pmp_addrbits(scratch));
+	sbi_printf("Boot HART SRCMD Count     : %d\n",
+		   sbi_hart_srcmd_count(scratch));
+	sbi_printf("Boot HART MDCFG Count     : %d\n",
+		   sbi_hart_mdcfg_count(scratch));
+	sbi_printf("Boot HART entry Count     : %d\n",
+		   sbi_hart_entry_count(scratch));
 	sbi_printf("Boot HART MHPM Count      : %d\n",
 		   sbi_hart_mhpm_count(scratch));
 	sbi_hart_delegation_dump(scratch, "Boot HART ", "         ");
@@ -324,6 +330,13 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 		sbi_hart_hang();
 	}
 
+	rc = sbi_hart_iopmp_configure(scratch);
+	if (rc) {
+		sbi_printf("%s: IOPMP configure failed (error %d)\n",
+			   __func__, rc);
+		sbi_hart_hang();
+	}
+
 	/*
 	 * Note: Platform final initialization should be last so that
 	 * it sees correct domain assignment and PMP configuration.
@@ -396,6 +409,10 @@ static void init_warm_startup(struct sbi_scratch *scratch, u32 hartid)
 	if (rc)
 		sbi_hart_hang();
 
+	rc = sbi_hart_iopmp_configure(scratch);
+	if (rc)
+		sbi_hart_hang();
+
 	rc = sbi_platform_final_init(plat, FALSE);
 	if (rc)
 		sbi_hart_hang();
@@ -417,6 +434,10 @@ static void init_warm_resume(struct sbi_scratch *scratch)
 		sbi_hart_hang();
 
 	rc = sbi_hart_pmp_configure(scratch);
+	if (rc)
+		sbi_hart_hang();
+
+	rc = sbi_hart_iopmp_configure(scratch);
 	if (rc)
 		sbi_hart_hang();
 

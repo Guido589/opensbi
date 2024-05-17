@@ -187,6 +187,10 @@ int pmp_set(unsigned int n, unsigned long prot, unsigned long addr,
 int pmp_get(unsigned int n, unsigned long *prot_out, unsigned long *addr_out,
 	    unsigned long *log2len);
 
+int srcmd_set(unsigned int n, unsigned long val);
+int mdcfg_set(unsigned int n, unsigned long val);
+int entry_set(unsigned int n,  unsigned long prot, unsigned long val);
+
 #endif /* !__ASSEMBLER__ */
 
 #endif

@@ -100,18 +100,33 @@ unsigned long csr_read_num(int csr_num)
 #define switchcase_csr_read_2(__csr_num, __val)	\
 	switchcase_csr_read(__csr_num + 0, __val)	\
 	switchcase_csr_read(__csr_num + 1, __val)
+#define switchcase_csr_read_3(__csr_num, __val)	\
+	switchcase_csr_read_2(__csr_num + 0, __val)	\
+	switchcase_csr_read(__csr_num + 2, __val)
 #define switchcase_csr_read_4(__csr_num, __val)	\
 	switchcase_csr_read_2(__csr_num + 0, __val)	\
 	switchcase_csr_read_2(__csr_num + 2, __val)
+#define switchcase_csr_read_7(__csr_num, __val)	\
+	switchcase_csr_read_4(__csr_num + 0, __val)	\
+	switchcase_csr_read_3(__csr_num + 4, __val)
 #define switchcase_csr_read_8(__csr_num, __val)	\
 	switchcase_csr_read_4(__csr_num + 0, __val)	\
 	switchcase_csr_read_4(__csr_num + 4, __val)
+#define switchcase_csr_read_15(__csr_num, __val)	\
+	switchcase_csr_read_8(__csr_num + 0, __val)	\
+	switchcase_csr_read_7(__csr_num + 8, __val)
 #define switchcase_csr_read_16(__csr_num, __val)	\
 	switchcase_csr_read_8(__csr_num + 0, __val)	\
 	switchcase_csr_read_8(__csr_num + 8, __val)
+#define switchcase_csr_read_31(__csr_num, __val)	\
+	switchcase_csr_read_16(__csr_num + 0, __val)	\
+	switchcase_csr_read_15(__csr_num + 16, __val)
 #define switchcase_csr_read_32(__csr_num, __val)	\
 	switchcase_csr_read_16(__csr_num + 0, __val)	\
 	switchcase_csr_read_16(__csr_num + 16, __val)
+#define switchcase_csr_read_63(__csr_num, __val)	\
+	switchcase_csr_read_32(__csr_num + 0, __val)	\
+	switchcase_csr_read_31(__csr_num + 32, __val)
 #define switchcase_csr_read_64(__csr_num, __val)	\
 	switchcase_csr_read_32(__csr_num + 0, __val)	\
 	switchcase_csr_read_32(__csr_num + 32, __val)
@@ -121,6 +136,10 @@ unsigned long csr_read_num(int csr_num)
 	switch (csr_num) {
 	switchcase_csr_read_16(CSR_PMPCFG0, ret)
 	switchcase_csr_read_64(CSR_PMPADDR0, ret)
+	switchcase_csr_read_63(CSR_MDCFG0, ret)
+	switchcase_csr_read_16(CSR_SRCMD0, ret)
+	switchcase_csr_read_16(CSR_ENTRY_ADDR0, ret)
+	switchcase_csr_read_16(CSR_ENTRY_CFG0, ret)
 	switchcase_csr_read(CSR_MCYCLE, ret)
 	switchcase_csr_read(CSR_MINSTRET, ret)
 	switchcase_csr_read(CSR_MHPMCOUNTER3, ret)
@@ -174,18 +193,33 @@ void csr_write_num(int csr_num, unsigned long val)
 #define switchcase_csr_write_2(__csr_num, __val)	\
 	switchcase_csr_write(__csr_num + 0, __val)	\
 	switchcase_csr_write(__csr_num + 1, __val)
+#define switchcase_csr_write_3(__csr_num, __val)	\
+	switchcase_csr_write_2(__csr_num + 0, __val)	\
+	switchcase_csr_write(__csr_num + 2, __val)
 #define switchcase_csr_write_4(__csr_num, __val)	\
 	switchcase_csr_write_2(__csr_num + 0, __val)	\
 	switchcase_csr_write_2(__csr_num + 2, __val)
+#define switchcase_csr_write_7(__csr_num, __val)	\
+	switchcase_csr_write_4(__csr_num + 0, __val)	\
+	switchcase_csr_write_3(__csr_num + 4, __val)
 #define switchcase_csr_write_8(__csr_num, __val)	\
 	switchcase_csr_write_4(__csr_num + 0, __val)	\
 	switchcase_csr_write_4(__csr_num + 4, __val)
+#define switchcase_csr_write_15(__csr_num, __val)	\
+	switchcase_csr_write_8(__csr_num + 0, __val)	\
+	switchcase_csr_write_7(__csr_num + 8, __val)
 #define switchcase_csr_write_16(__csr_num, __val)	\
 	switchcase_csr_write_8(__csr_num + 0, __val)	\
 	switchcase_csr_write_8(__csr_num + 8, __val)
+#define switchcase_csr_write_31(__csr_num, __val)	\
+	switchcase_csr_write_16(__csr_num + 0, __val)	\
+	switchcase_csr_write_15(__csr_num + 16, __val)
 #define switchcase_csr_write_32(__csr_num, __val)	\
 	switchcase_csr_write_16(__csr_num + 0, __val)	\
 	switchcase_csr_write_16(__csr_num + 16, __val)
+#define switchcase_csr_write_63(__csr_num, __val)	\
+	switchcase_csr_write_32(__csr_num + 0, __val)	\
+	switchcase_csr_write_31(__csr_num + 32, __val)
 #define switchcase_csr_write_64(__csr_num, __val)	\
 	switchcase_csr_write_32(__csr_num + 0, __val)	\
 	switchcase_csr_write_32(__csr_num + 32, __val)
@@ -193,6 +227,10 @@ void csr_write_num(int csr_num, unsigned long val)
 	switch (csr_num) {
 	switchcase_csr_write_16(CSR_PMPCFG0, val)
 	switchcase_csr_write_64(CSR_PMPADDR0, val)
+	switchcase_csr_write_63(CSR_MDCFG0, val)
+	switchcase_csr_write_16(CSR_SRCMD0, val)
+	switchcase_csr_write_16(CSR_ENTRY_ADDR0, val)
+	switchcase_csr_write_16(CSR_ENTRY_CFG0, val)
 	switchcase_csr_write(CSR_MCYCLE, val)
 	switchcase_csr_write(CSR_MINSTRET, val)
 	switchcase_csr_write(CSR_MHPMCOUNTER3, val)
@@ -346,5 +384,46 @@ int pmp_get(unsigned int n, unsigned long *prot_out, unsigned long *addr_out,
 	*addr_out    = addr;
 	*log2len     = len;
 
+	return 0;
+}
+
+int srcmd_set(unsigned int n, unsigned long val)
+{
+	if (n >= SRCMD_COUNT)
+		return SBI_EINVAL;
+
+	int srcmd_csr;
+
+	srcmd_csr = CSR_SRCMD0 + n;
+	csr_write_num(srcmd_csr, val);
+
+	return 0;
+}
+
+int mdcfg_set(unsigned int n, unsigned long val)
+{
+	if (n >= MDCFG_COUNT)
+		return SBI_EINVAL;
+
+	int mdcfg_csr;
+
+	mdcfg_csr = CSR_MDCFG0 + n;
+	csr_write_num(mdcfg_csr, 1);
+
+	return 0;
+}
+
+int entry_set(unsigned int n,  unsigned long prot, unsigned long val)
+{
+	if (n >= ENTRY_COUNT)
+		return SBI_EINVAL;
+
+	int entry_addr_csr, entry_cfg_csr;
+
+	entry_addr_csr = CSR_ENTRY_ADDR0 + n;
+	entry_cfg_csr = CSR_ENTRY_CFG0 + n;
+	csr_write_num(entry_addr_csr, val);
+	csr_write_num(entry_cfg_csr, prot);
+	
 	return 0;
 }

@@ -58,8 +58,12 @@ void sbi_hart_delegation_dump(struct sbi_scratch *scratch,
 unsigned int sbi_hart_pmp_count(struct sbi_scratch *scratch);
 unsigned long sbi_hart_pmp_granularity(struct sbi_scratch *scratch);
 unsigned int sbi_hart_pmp_addrbits(struct sbi_scratch *scratch);
+unsigned int sbi_hart_srcmd_count(struct sbi_scratch *scratch);
+unsigned int sbi_hart_mdcfg_count(struct sbi_scratch *scratch);
+unsigned int sbi_hart_entry_count(struct sbi_scratch *scratch);
 unsigned int sbi_hart_mhpm_bits(struct sbi_scratch *scratch);
 int sbi_hart_pmp_configure(struct sbi_scratch *scratch);
+int sbi_hart_iopmp_configure(struct sbi_scratch *scratch);
 int sbi_hart_priv_version(struct sbi_scratch *scratch);
 void sbi_hart_get_priv_version_str(struct sbi_scratch *scratch,
 				   char *version_str, int nvstr);
