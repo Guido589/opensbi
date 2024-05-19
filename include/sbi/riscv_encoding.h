@@ -671,6 +671,9 @@
 #define CSR_ENTRY_ADDR15 0xBDF
 #define CSR_ENTRY_CFG15  0xBEF
 
+#define CSR_MDCFGLCK 0xBF0
+#define CSR_ENTRYLCK 0xBF1
+
 /* Machine Counters/Timers */
 #define CSR_MCYCLE			0xb00
 #define CSR_MINSTRET			0xb02

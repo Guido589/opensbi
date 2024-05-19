@@ -383,6 +383,9 @@ int sbi_hart_iopmp_configure(struct sbi_scratch *scratch)
 		entry_set(0, iopmp_flags, entry_addr_initial);
 	}
 
+	csr_write(CSR_MDCFGLCK, 0);
+	csr_write(CSR_ENTRYLCK, 0);
+
 	return 0;
 }
 
