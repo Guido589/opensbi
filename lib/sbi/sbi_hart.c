@@ -363,29 +363,54 @@ int sbi_hart_pmp_configure(struct sbi_scratch *scratch)
 
 int sbi_hart_iopmp_configure(struct sbi_scratch *scratch)
 {
-	unsigned long srcmd_initial = 2, mdcfg_initial = 1, entry_addr_initial = 0xFFFFFFFFFFFFFFFF, iopmp_flags = 0;
+	struct sbi_domain_memregion *reg;
+	struct sbi_domain *dom = sbi_domain_thishart_ptr();
+	unsigned long srcmd_initial  = 2, 
+	              mdcfg_initial  = 5, 
+				  fw_start       = scratch->fw_start,
+				  fw_end,
+				  last_addr      = 0xFFFFFFFFFFFFFFFF, 
+				  no_permissions = 0 | ENTRY_CFG_TOR,
+				  iopmp_flags = 0;
 	unsigned int srcmd_count = sbi_hart_srcmd_count(scratch);
 	unsigned int mdcfg_count = sbi_hart_mdcfg_count(scratch);
 	unsigned int entry_count = sbi_hart_entry_count(scratch);
 
-	if (srcmd_count){
-		for (unsigned int srcmd_idx = 0; srcmd_idx < srcmd_count; srcmd_idx++) {
-			srcmd_set(srcmd_idx, srcmd_initial);
+	sbi_domain_for_each_memregion(dom, reg) {
+		if (reg->base != fw_start){
+			continue;
 		}
+
+		fw_end = fw_start + (1UL << reg->order) - 1;
+
+		if (srcmd_count){
+			for (unsigned int srcmd_idx = 0; srcmd_idx < srcmd_count; srcmd_idx++) {
+				srcmd_set(srcmd_idx, srcmd_initial);
+			}
+		}
+
+		if (mdcfg_count) {
+			mdcfg_set(0, mdcfg_initial);
+		}
+
+		if (entry_count) {
+			iopmp_flags |= ENTRY_CFG_TOR | ENTRY_CFG_R | ENTRY_CFG_W | ENTRY_CFG_X;
+
+			// all permissions: [0, fw_start[
+			entry_set(0, iopmp_flags, fw_start);
+			// no permissions:  [fw_start, fw_end + 1[
+			entry_set(1, no_permissions, fw_end + 1);
+			// all permissions: [fw_end + 1, last_addr[
+			entry_set(2, iopmp_flags, last_addr);
+			// no permissions:  [last_addr, 0[
+			entry_set(3, no_permissions, 0);
+			// all permissions: [0, last_addr[
+			entry_set(4, iopmp_flags, last_addr);
+		}
+
+		csr_write(CSR_MDCFGLCK, 0);
+		csr_write(CSR_ENTRYLCK, 0);
 	}
-
-	if (mdcfg_count) {
-		mdcfg_set(0, mdcfg_initial);
-	}
-
-	if (entry_count) {
-		iopmp_flags |= ENTRY_CFG_TOR | ENTRY_CFG_R | ENTRY_CFG_W | ENTRY_CFG_X;
-		entry_set(0, iopmp_flags, entry_addr_initial);
-	}
-
-	csr_write(CSR_MDCFGLCK, 0);
-	csr_write(CSR_ENTRYLCK, 0);
-
 	return 0;
 }
 

@@ -417,7 +417,7 @@ int mdcfg_set(unsigned int n, unsigned long val)
 	return 0;
 }
 
-int entry_set(unsigned int n,  unsigned long prot, unsigned long val)
+int entry_set(unsigned int n,  unsigned long prot, unsigned long paddr)
 {
 	if (n >= ENTRY_COUNT)
 		return SBI_EINVAL;
@@ -426,7 +426,7 @@ int entry_set(unsigned int n,  unsigned long prot, unsigned long val)
 
 	entry_addr_csr = CSR_ENTRY_ADDR0 + n;
 	entry_cfg_csr = CSR_ENTRY_CFG0 + n;
-	csr_write_num(entry_addr_csr, val);
+	csr_write_num(entry_addr_csr, paddr>>ENTRY_ADDR_SHIFT);
 	csr_write_num(entry_cfg_csr, prot);
 	
 	return 0;
