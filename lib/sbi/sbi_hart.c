@@ -381,7 +381,7 @@ int sbi_hart_iopmp_configure(struct sbi_scratch *scratch)
 			continue;
 		}
 
-		fw_end = fw_start + (1UL << reg->order) - 1;
+		fw_end = fw_start + (1UL << reg->order);
 
 		if (srcmd_count){
 			for (unsigned int srcmd_idx = 0; srcmd_idx < srcmd_count; srcmd_idx++) {
