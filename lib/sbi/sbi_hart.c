@@ -402,10 +402,6 @@ int sbi_hart_iopmp_configure(struct sbi_scratch *scratch)
 			entry_set(1, no_permissions, fw_end + 1);
 			// all permissions: [fw_end + 1, last_addr[
 			entry_set(2, iopmp_flags, last_addr);
-			// no permissions:  [last_addr, 0[
-			entry_set(3, no_permissions, 0);
-			// all permissions: [0, last_addr[
-			entry_set(4, iopmp_flags, last_addr);
 		}
 
 		csr_write(CSR_MDCFGLCK, 0);
